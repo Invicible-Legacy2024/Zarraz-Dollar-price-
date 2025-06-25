@@ -861,41 +861,53 @@
 
     // Fetch and display Zarraz Dollar price
     async function fetchZdPrice() {
-      const apiKey = "4ca26995-40db-490f-9fc5-4caaac357333"; // Your CoinMarketCap API key
-      const url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest";
-      const headers = {
-        "Accepts": "application/json",
-        "X-CMC_PRO_API_KEY": apiKey
-      };
-      const params = {
-        "symbol": "ZD",
-        "convert": "USD"
-      };
-
+      const apiKey = "4ca26995-40db-490f-9fc5-4caaac357333"; // Replace with your valid CoinMarketCap API key
+      const url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=ZD&convert=USD";
       try {
         const response = await fetch(url, {
-          method: "GET",
-          headers: headers,
-          params: params
+          headers: {
+            "Accept": "application/json",
+            "X-CMC_PRO_API_KEY": apiKey
+          }
         });
         const data = await response.json();
-
         if (data.status.error_code === 0 && data.data.ZD) {
           const zdPrice = data.data.ZD.quote.USD.price.toFixed(5);
           document.getElementById("zd-price").textContent = `(${zdPrice} USD)`;
         } else {
           document.getElementById("zd-price").textContent = "(Price unavailable)";
-          console.error("Error fetching ZD price:", data.status.error_message);
+          console.error("Error fetching ZD price:", data.status.error_message || "Symbol not found");
         }
       } catch (error) {
         document.getElementById("zd-price").textContent = "(Error fetching price)";
-        console.error("Fetch error:", error);
+        console.error("Fetch error:", error.message);
       }
     }
 
     // Update price every 60 seconds
     setInterval(fetchZdPrice, 60000);
     fetchZdPrice(); // Initial fetch
+
+    // Optional: Alternative using CoinGecko API (uncomment to use if CoinMarketCap fails)
+    /*
+    async function fetchZdPrice() {
+      const url = "https://api.coingecko.com/api/v3/simple/price?ids=zarraz-dollar&vs_currencies=usd";
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data["zarraz-dollar"]) {
+          const zdPrice = data["zarraz-dollar"].usd.toFixed(5);
+          document.getElementById("zd-price").textContent = `(${zdPrice} USD)`;
+        } else {
+          document.getElementById("zd-price").textContent = "(Price unavailable)";
+          console.error("Error: Zarraz Dollar not found");
+        }
+      } catch (error) {
+        document.getElementById("zd-price").textContent = "(Error fetching price)";
+        console.error("Fetch error:", error.message);
+      }
+    }
+    */
   </script>
 </body>
 </html>
